@@ -1,6 +1,8 @@
-import React from "react";
-import HelloWorld from "./components/HelloWorld";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const App: React.FC = () => <HelloWorld />;
+import React from "react";
+import Dashboard from "components/Dashboard";
+
+const App: React.FC = () => <Dashboard />;
 
 export default App;

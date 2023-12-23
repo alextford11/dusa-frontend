@@ -6,8 +6,8 @@
   "repository": "https://github.com/alextford11/dusa-frontend",
   "license": "MIT",
   "scripts": {
-    "develop": "webpack-cli serve --mode=development --env development --open --hot",
-    "build": "webpack --mode=production --env production --progress",
+    "start": "dotenv -f .env run webpack-cli serve --mode=development --env development --open --hot",
+    "build": "dotenv -f .env.production run webpack --mode=production --env production --progress",
     "lint": "eslint './src/**/*.{ts,tsx,js,jsx}'",
     "lint:fix": "eslint './src/**/*.{ts,tsx,js,jsx}' --fix"
   },
@@ -37,7 +37,14 @@
     "webpack-dev-server": "4.15.1"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.2",
+    "bootstrap": "^5.3.2",
+    "css-loader": "^6.8.1",
+    "dotenv": "^16.3.1",
+    "process": "^0.11.10",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-bootstrap": "^2.9.1",
+    "react-dom": "^18.2.0",
+    "style-loader": "^3.3.3"
   }
 }
