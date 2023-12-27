@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Accordion, Badge, Card, Col, Container, ListGroup, Row} from "react-bootstrap";
+import {Accordion, Badge, Button, Card, Col, Container, ListGroup, Row} from "react-bootstrap";
 import {handleErrors} from "components/Utils";
 import MapComponent from "components/Map";
 
@@ -25,7 +25,7 @@ interface Stats {
 
 const CategoryAccordion: React.FC<{categories: Category[]}> = ({categories}) => {
     return (
-        <Accordion>
+        <Accordion className="pb-3">
             {categories.map((category) => (
                 <Accordion.Item key={category.id} eventKey={category.id}>
                     <Accordion.Header>{category.name}</Accordion.Header>
@@ -48,15 +48,33 @@ const CategoryAccordion: React.FC<{categories: Category[]}> = ({categories}) => 
     );
 };
 
-const TimeRangeCard: React.FC<{time_range_title: string; categories: Category[]}> = ({
-    time_range_title,
+interface TimeRangeCardProps {
+    timeRangeTitleText: string;
+    timeRangeLinkDescriptor: string;
+    categories: Category[];
+}
+
+const TimeRangeCard: React.FC<TimeRangeCardProps> = ({
+    timeRangeTitleText,
+    timeRangeLinkDescriptor,
     categories
 }) => {
     return (
         <Card className="mb-4">
-            <Card.Header>{time_range_title}</Card.Header>
+            <Card.Header>{timeRangeTitleText}</Card.Header>
             <Card.Body>
-                <CategoryAccordion categories={categories} />
+                {categories.length ? (
+                    <CategoryAccordion categories={categories} />
+                ) : (
+                    <Card.Text>Nothing recorded...</Card.Text>
+                )}
+
+                <Card.Link href="#">
+                    <Button>View {timeRangeLinkDescriptor} stats</Button>
+                </Card.Link>
+                <Card.Link href="#">
+                    <Button>View {timeRangeLinkDescriptor} locations</Button>
+                </Card.Link>
             </Card.Body>
         </Card>
     );
@@ -91,9 +109,21 @@ const Dashboard: React.FC = () => {
             </Row>
             <Row>
                 <Col>
-                    <TimeRangeCard time_range_title="Today" categories={stats.today} />
-                    <TimeRangeCard time_range_title="Yesterday" categories={stats.yesterday} />
-                    <TimeRangeCard time_range_title="All Time" categories={stats.all_time} />
+                    <TimeRangeCard
+                        timeRangeTitleText="Today"
+                        timeRangeLinkDescriptor="today's"
+                        categories={stats.today}
+                    />
+                    <TimeRangeCard
+                        timeRangeTitleText="Yesterday"
+                        timeRangeLinkDescriptor="yesterday's"
+                        categories={stats.yesterday}
+                    />
+                    <TimeRangeCard
+                        timeRangeTitleText="All Time"
+                        timeRangeLinkDescriptor="all"
+                        categories={stats.all_time}
+                    />
                 </Col>
             </Row>
         </Container>
