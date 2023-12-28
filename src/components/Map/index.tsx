@@ -23,13 +23,13 @@ const loader = new Loader({
     libraries: ["maps"]
 });
 
-const DEFAULT_MAP_OPTIONS = {
+const defaultMapOptions = {
     zoom: 5,
     center: {lat: -27.470441, lng: 153.026032},
     mapTypeId: "terrain"
 };
 
-const MapComponent: React.FC = () => {
+const MapElement: React.FC = () => {
     const [locations, setLocations] = useState<Location[]>([]);
     const [showMap, setShowMap] = useState<boolean>(false);
 
@@ -61,7 +61,7 @@ const MapComponent: React.FC = () => {
                         mapTypeId: "terrain"
                     };
                 } else {
-                    mapOptions = DEFAULT_MAP_OPTIONS;
+                    mapOptions = defaultMapOptions;
                 }
                 const map = new Map(document.getElementById("map"), mapOptions);
                 if (locationCoordsArray.length) {
@@ -101,4 +101,4 @@ const MapComponent: React.FC = () => {
     }
 };
 
-export default MapComponent;
+export default MapElement;

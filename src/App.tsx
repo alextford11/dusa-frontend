@@ -1,16 +1,20 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import React from "react";
-import Dashboard from "components/Dashboard";
-import {BrowserRouter, Routes, Route} from "react-router-dom";
+import Dashboard from "src/presentation/Dashboard";
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import Location from "./presentation/Location";
 
 const App: React.FC = () => {
     return (
-        <BrowserRouter>
+        <Router>
             <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/">
+                    <Route index element={<Dashboard />} />
+                    <Route path="location" element={<Location />} />
+                </Route>
             </Routes>
-        </BrowserRouter>
+        </Router>
     );
 };
 
