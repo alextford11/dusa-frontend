@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import React from "react";
 import Dashboard from "src/presentation/Dashboard";
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import {HashRouter as Router, Routes, Route} from "react-router-dom";
 import Location from "./presentation/Location";
 
 const App: React.FC = () => {
