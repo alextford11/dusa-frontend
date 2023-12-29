@@ -1,4 +1,13 @@
 #map {
+    height: 100%;
+    width: 100%;
+}
+
+.map-container {
     height: 400px;
     width: 100%;
+}
+
+.map-container.large {
+    height: calc(100vh - 3rem);
 }

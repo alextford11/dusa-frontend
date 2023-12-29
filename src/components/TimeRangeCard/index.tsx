@@ -8,13 +8,22 @@ interface TimeRangeCardProps {
     timeRangeTitleText: string;
     timeRangeLinkDescriptor: string;
     categories: Category[];
+    nsfw: string;
+    time_range: string;
 }
 
 const TimeRangeCard: React.FC<TimeRangeCardProps> = ({
     timeRangeTitleText,
     timeRangeLinkDescriptor,
-    categories
+    categories,
+    nsfw,
+    time_range
 }) => {
+    let searchQuery = `?time_range=${time_range}`;
+    if (nsfw === "true") {
+        searchQuery += `&nsfw=${nsfw}`;
+    }
+
     return (
         <Card className="mb-4">
             <Card.Header>{timeRangeTitleText}</Card.Header>
@@ -25,14 +34,15 @@ const TimeRangeCard: React.FC<TimeRangeCardProps> = ({
                     <Card.Text>Nothing recorded...</Card.Text>
                 )}
 
-                <Link to="location">
-                    {/*<Card.Link href="#">*/}
+                <Link
+                    to={{pathname: "/stats", search: searchQuery}}
+                    className="d-inline-block me-3"
+                >
                     <Button>View {timeRangeLinkDescriptor} stats</Button>
-                    {/*</Card.Link>*/}
                 </Link>
-                <Card.Link href="#">
+                <Link to={{pathname: "/location", search: searchQuery}} className="d-inline-block">
                     <Button>View {timeRangeLinkDescriptor} locations</Button>
-                </Card.Link>
+                </Link>
             </Card.Body>
         </Card>
     );

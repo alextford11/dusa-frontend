@@ -1,10 +1,15 @@
 import "./index.css";
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {handleErrors} from "components/Utils";
 import {Loader} from "@googlemaps/js-api-loader";
+import {Col, Row} from "react-bootstrap";
 
 declare const BACKEND_URL_BASE: string;
 declare const GOOGLE_MAPS_API_KEY: string;
+
+interface mapElementProps {
+    large?: boolean;
+}
 interface Location {
     id: string;
     created: string;
@@ -29,20 +34,20 @@ const defaultMapOptions = {
     mapTypeId: "terrain"
 };
 
-const MapElement: React.FC = () => {
-    const [locations, setLocations] = useState<Location[]>([]);
-    const [showMap, setShowMap] = useState<boolean>(false);
-
-    const getLocations = async () => {
+const MapElement: React.FC<mapElementProps> = (props) => {
+    const getLocations = async (): Promise<Location[]> => {
         try {
-            const response = await fetch(`${BACKEND_URL_BASE}/location/list`).then(handleErrors);
-            setLocations(response.locations);
+            const request = await fetch(`${BACKEND_URL_BASE}/location/list`).then(handleErrors);
+            const response = await request;
+            return response.locations;
         } catch (error) {
-            console.error("Error fetching stats:", error);
+            console.error("Error fetching locations:", error);
+            return [];
         }
     };
 
-    const loadMap = React.useCallback(() => {
+    const loadMap = React.useCallback(async () => {
+        const locations = await getLocations();
         const locationCoordsArray: LocationCoords[] = locations.map((location) => {
             const lat = parseFloat(location.latitude);
             const lng = parseFloat(location.longitude);
@@ -79,26 +84,21 @@ const MapElement: React.FC = () => {
             .catch((error) => {
                 console.error("Error loading Google Maps:", error);
             });
-    }, [locations]);
-
-    useEffect(() => {
-        getLocations();
     }, []);
 
     useEffect(() => {
-        setShowMap(true);
         loadMap();
     }, [loadMap]);
 
-    if (!showMap) {
-        return <div id="map">Loading map...</div>;
-    } else {
-        return (
-            <div id="map" className="my-4 rounded-4">
-                {/* The map will be rendered inside this div */}
-            </div>
-        );
-    }
+    return (
+        <Row>
+            <Col className={`map-container my-4 ${props.large ? "large" : ""}`}>
+                <div id="map" className="rounded-4">
+                    {/* The map will be rendered inside this div */}
+                </div>
+            </Col>
+        </Row>
+    );
 };
 
 export default MapElement;

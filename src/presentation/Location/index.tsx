@@ -1,14 +1,12 @@
 import MapElement from "components/Map";
-import {Row, Col} from "react-bootstrap";
+import {Container} from "react-bootstrap";
 import React from "react";
 
 const Location: React.FC = () => {
     return (
-        <Row>
-            <Col>
-                <MapElement />
-            </Col>
-        </Row>
+        <Container>
+            <MapElement large={true} />
+        </Container>
     );
 };
 
