@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Col, Container, Row} from "react-bootstrap";
+import {Col, Row} from "react-bootstrap";
 import {handleErrors} from "components/Utils";
 import MapElement from "components/Map";
 import {Category} from "components/GlobalInterfaces";
@@ -35,8 +35,8 @@ const Dashboard: React.FC = () => {
     }, [nsfw]);
 
     return (
-        <Container>
-            <MapElement large={false} />
+        <>
+            <MapElement />
             <Row>
                 <Col>
                     <TimeRangeCard
@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
                     />
                 </Col>
             </Row>
-        </Container>
+        </>
     );
 };
 

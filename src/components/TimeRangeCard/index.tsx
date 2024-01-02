@@ -38,10 +38,10 @@ const TimeRangeCard: React.FC<TimeRangeCardProps> = ({
                     to={{pathname: "/stats", search: searchQuery}}
                     className="d-inline-block me-3"
                 >
-                    <Button>View {timeRangeLinkDescriptor} stats</Button>
+                    <Button size="sm">View {timeRangeLinkDescriptor} stats</Button>
                 </Link>
                 <Link to={{pathname: "/location", search: searchQuery}} className="d-inline-block">
-                    <Button>View {timeRangeLinkDescriptor} locations</Button>
+                    <Button size="sm">View {timeRangeLinkDescriptor} locations</Button>
                 </Link>
             </Card.Body>
         </Card>

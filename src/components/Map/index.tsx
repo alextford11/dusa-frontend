@@ -1,8 +1,9 @@
 import "./index.css";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {handleErrors} from "components/Utils";
 import {Loader} from "@googlemaps/js-api-loader";
-import {Col, Row} from "react-bootstrap";
+import {Col, Row, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
+import {useLocation, useNavigate} from "react-router-dom";
 
 declare const BACKEND_URL_BASE: string;
 declare const GOOGLE_MAPS_API_KEY: string;
@@ -34,17 +35,76 @@ const defaultMapOptions = {
     mapTypeId: "terrain"
 };
 
-const MapElement: React.FC<mapElementProps> = (props) => {
-    const getLocations = async (): Promise<Location[]> => {
+const RecentlyUpdated: React.FC = () => {
+    const [ukTime, setUkTime] = useState<string>("-");
+    const [localTime, setLocalTime] = useState<string>("-");
+
+    const getRecentLocation = React.useCallback(async (): Promise<Location> => {
         try {
-            const request = await fetch(`${BACKEND_URL_BASE}/location/list`).then(handleErrors);
+            return await fetch(`${BACKEND_URL_BASE}/location/recent`).then(handleErrors);
+        } catch (error) {
+            console.error("Error fetching recent location:", error);
+            return;
+        }
+    }, []);
+
+    const updateRecentLocation = React.useCallback(async () => {
+        const recentLocation = await getRecentLocation();
+        const response = await fetch(
+            `https://maps.googleapis.com/maps/api/timezone/json?location=${
+                recentLocation.latitude
+            },${recentLocation.longitude}&timestamp=${Math.floor(
+                Date.now() / 1000
+            )}&key=${GOOGLE_MAPS_API_KEY}`
+        );
+        const timezoneDetails = await response.json();
+
+        const currentTime = new Date(recentLocation.created);
+        setUkTime(
+            currentTime.toLocaleString("en-GB", {
+                timeZone: "Europe/London",
+                dateStyle: "short",
+                timeStyle: "short"
+            })
+        );
+        setLocalTime(
+            currentTime.toLocaleString("en-GB", {
+                timeZone: timezoneDetails.timeZoneId,
+                dateStyle: "short",
+                timeStyle: "short"
+            })
+        );
+    }, [getRecentLocation]);
+
+    useEffect(() => {
+        updateRecentLocation();
+    }, [updateRecentLocation]);
+
+    return (
+        <p className="m-0 small text-danger">
+            <strong>Last updated</strong> UK: {ukTime} - Local: {localTime}
+        </p>
+    );
+};
+
+const MapElement: React.FC<mapElementProps> = (props) => {
+    const navigate = useNavigate();
+    const windowLocation = useLocation();
+    const queryParams = new URLSearchParams(windowLocation.search);
+    const time_range: string = queryParams.get("time_range") || "today";
+
+    const getLocations = React.useCallback(async (): Promise<Location[]> => {
+        try {
+            const request = await fetch(
+                `${BACKEND_URL_BASE}/location/list?time_range=${time_range}`
+            ).then(handleErrors);
             const response = await request;
             return response.locations;
         } catch (error) {
             console.error("Error fetching locations:", error);
             return [];
         }
-    };
+    }, [time_range]);
 
     const loadMap = React.useCallback(async () => {
         const locations = await getLocations();
@@ -84,20 +144,51 @@ const MapElement: React.FC<mapElementProps> = (props) => {
             .catch((error) => {
                 console.error("Error loading Google Maps:", error);
             });
-    }, []);
+    }, [getLocations]);
+
+    const handleTimeRangeButtonOnChange = (buttonValue: string) => {
+        navigate({search: `?time_range=${buttonValue}`});
+    };
 
     useEffect(() => {
         loadMap();
     }, [loadMap]);
 
     return (
-        <Row>
-            <Col className={`map-container my-4 ${props.large ? "large" : ""}`}>
-                <div id="map" className="rounded-4">
-                    {/* The map will be rendered inside this div */}
-                </div>
-            </Col>
-        </Row>
+        <>
+            <Row className="mb-2">
+                <Col>
+                    <RecentlyUpdated />
+                </Col>
+                {props.large ? (
+                    <Col className="text-end">
+                        <ToggleButtonGroup
+                            type="radio"
+                            name="options"
+                            defaultValue={time_range}
+                            onChange={handleTimeRangeButtonOnChange}
+                        >
+                            <ToggleButton id="tbg-radio-1" value="today" size="sm">
+                                Today
+                            </ToggleButton>
+                            <ToggleButton id="tbg-radio-2" value="yesterday" size="sm">
+                                Yesterday
+                            </ToggleButton>
+                            <ToggleButton id="tbg-radio-3" value="all_time" size="sm">
+                                All Time
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                    </Col>
+                ) : null}
+            </Row>
+            <Row className="mb-4">
+                <Col className={`map-container ${props.large ? "large" : ""}`}>
+                    <div id="map" className="rounded-4">
+                        {/* The map will be rendered inside this div */}
+                    </div>
+                </Col>
+            </Row>
+        </>
     );
 };
 

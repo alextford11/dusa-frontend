@@ -7,11 +7,6 @@ import {TsconfigPathsPlugin} from "tsconfig-paths-webpack-plugin";
 import dotenv from "dotenv";
 
 const webpackConfig = (env): Configuration => {
-    console.log({
-        ...Object.entries(
-            dotenv.config({path: env.production ? ".env.production" : ".env"}).parsed
-        ).reduce((acc, curr) => ({...acc, [`${curr[0]}`]: JSON.stringify(curr[1])}), {})
-    });
     return {
         entry: "./src/index.tsx",
         ...(env.production || !env.development ? {} : {devtool: "eval-source-map"}),
