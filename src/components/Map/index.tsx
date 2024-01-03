@@ -35,11 +35,11 @@ const defaultMapOptions = {
     mapTypeId: "terrain"
 };
 
-const RecentlyUpdated: React.FC = () => {
+const LastUpdated: React.FC = () => {
     const [ukTime, setUkTime] = useState<string>("-");
     const [localTime, setLocalTime] = useState<string>("-");
 
-    const getRecentLocation = React.useCallback(async (): Promise<Location> => {
+    const getLastLocation = React.useCallback(async (): Promise<Location> => {
         try {
             return await fetch(`${BACKEND_URL_BASE}/location/recent`).then(handleErrors);
         } catch (error) {
@@ -48,18 +48,16 @@ const RecentlyUpdated: React.FC = () => {
         }
     }, []);
 
-    const updateRecentLocation = React.useCallback(async () => {
-        const recentLocation = await getRecentLocation();
+    const updateLastLocation = React.useCallback(async () => {
+        const lastLocation = await getLastLocation();
         const response = await fetch(
-            `https://maps.googleapis.com/maps/api/timezone/json?location=${
-                recentLocation.latitude
-            },${recentLocation.longitude}&timestamp=${Math.floor(
-                Date.now() / 1000
-            )}&key=${GOOGLE_MAPS_API_KEY}`
+            `https://maps.googleapis.com/maps/api/timezone/json?location=${lastLocation.latitude},${
+                lastLocation.longitude
+            }&timestamp=${Math.floor(Date.now() / 1000)}&key=${GOOGLE_MAPS_API_KEY}`
         );
         const timezoneDetails = await response.json();
 
-        const currentTime = new Date(recentLocation.created);
+        const currentTime = new Date(lastLocation.created);
         setUkTime(
             currentTime.toLocaleString("en-GB", {
                 timeZone: "Europe/London",
@@ -74,11 +72,11 @@ const RecentlyUpdated: React.FC = () => {
                 timeStyle: "short"
             })
         );
-    }, [getRecentLocation]);
+    }, [getLastLocation]);
 
     useEffect(() => {
-        updateRecentLocation();
-    }, [updateRecentLocation]);
+        updateLastLocation();
+    }, [updateLastLocation]);
 
     return (
         <p className="m-0 small text-danger">
@@ -117,12 +115,12 @@ const MapElement: React.FC<mapElementProps> = (props) => {
         loader
             .importLibrary("maps")
             .then(({Map, Polyline}) => {
-                let mapOptions;
+                let mapOptions, lastLocation;
                 if (locationCoordsArray.length) {
-                    const recentLocation = locationCoordsArray[locationCoordsArray.length - 1];
+                    lastLocation = locationCoordsArray[locationCoordsArray.length - 1];
                     mapOptions = {
                         zoom: 11,
-                        center: {lat: recentLocation.lat, lng: recentLocation.lng},
+                        center: {lat: lastLocation.lat, lng: lastLocation.lng},
                         mapTypeId: "terrain"
                     };
                 } else {
@@ -158,7 +156,7 @@ const MapElement: React.FC<mapElementProps> = (props) => {
         <>
             <Row className="mb-2">
                 <Col>
-                    <RecentlyUpdated />
+                    <LastUpdated />
                 </Col>
                 {props.large ? (
                     <Col className="text-end">
