@@ -2,15 +2,14 @@ import "./index.css";
 import React, {useEffect, useState} from "react";
 import {handleErrors} from "components/Utils";
 import {Loader} from "@googlemaps/js-api-loader";
-import {Col, Row, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
-import {useLocation, useNavigate} from "react-router-dom";
+import {Col, Row} from "react-bootstrap";
+import {useLocation} from "react-router-dom";
+import {v4 as uuid4} from "uuid";
+import TimeRangeToggle from "components/TimeRangeToggle";
 
 declare const BACKEND_URL_BASE: string;
 declare const GOOGLE_MAPS_API_KEY: string;
 
-interface mapElementProps {
-    large?: boolean;
-}
 interface Location {
     id: string;
     created: string;
@@ -28,12 +27,48 @@ const loader = new Loader({
     version: "weekly",
     libraries: ["maps"]
 });
-
 const defaultMapOptions = {
     zoom: 5,
     center: {lat: -27.470441, lng: 153.026032},
-    mapTypeId: "terrain"
+    mapTypeId: "terrain",
+    mapId: uuid4()
 };
+
+interface futureLocation {
+    date: Date;
+    latitude: number;
+    longitude: number;
+}
+const futureLocations: futureLocation[] = [
+    {date: new Date(2024, 0, 28), latitude: -33.86864111615657, longitude: 151.20853918403085},
+    {date: new Date(2024, 1, 2), latitude: -28.641970494705618, longitude: 153.61045230186474},
+    {date: new Date(2024, 1, 4), latitude: -28.01623797918785, longitude: 153.39919275589466},
+    {date: new Date(2024, 1, 5), latitude: -27.47080223046896, longitude: 153.02600821797031},
+    {date: new Date(2024, 1, 6), latitude: -26.39596225022934, longitude: 153.08962731263733},
+    {date: new Date(2024, 1, 9), latitude: -25.90439590563777, longitude: 153.08958545207108},
+    {date: new Date(2024, 1, 10), latitude: -25.2057094630844, longitude: 153.18801484656174},
+    {date: new Date(2024, 1, 12), latitude: -25.90439590563777, longitude: 153.08958545207108},
+    {date: new Date(2024, 1, 14), latitude: -20.267777428403082, longitude: 148.71551739339378},
+    {date: new Date(2024, 1, 15), latitude: -20.256135316459996, longitude: 148.9791439054873},
+    {date: new Date(2024, 1, 17), latitude: -20.267777428403082, longitude: 148.71551739339378},
+    {date: new Date(2024, 1, 18), latitude: -19.135123886825433, longitude: 146.84111873261747},
+    {date: new Date(2024, 1, 21), latitude: -16.921072567966373, longitude: 145.77046078853348},
+    {date: new Date(2024, 1, 24), latitude: -37.8135294856578, longitude: 144.96105295793456},
+    {date: new Date(2024, 1, 26), latitude: -36.85563089998874, longitude: 174.76353424694122},
+    {date: new Date(2024, 1, 28), latitude: -36.890025485478965, longitude: 175.82200928183198},
+    {date: new Date(2024, 1, 29), latitude: -38.26057424740252, longitude: 175.10689605643873},
+    {date: new Date(2024, 2, 1), latitude: -38.14481298586597, longitude: 176.2377912350575},
+    {date: new Date(2024, 2, 2), latitude: -38.690211322248274, longitude: 176.08213450411682},
+    {date: new Date(2024, 2, 4), latitude: -41.29235127506859, longitude: 174.77872094550023},
+    {date: new Date(2024, 2, 7), latitude: -40.92213663011663, longitude: 172.98734990296236},
+    {date: new Date(2024, 2, 8), latitude: -41.75464384656404, longitude: 171.6057875152289},
+    {date: new Date(2024, 2, 9), latitude: -42.79500528909684, longitude: 170.9169610187557},
+    {date: new Date(2024, 2, 10), latitude: -43.37041454226783, longitude: 170.1767854567045},
+    {date: new Date(2024, 2, 12), latitude: -45.02958203338244, longitude: 168.661344229726},
+    {date: new Date(2024, 2, 15), latitude: -44.00608520433658, longitude: 170.47984767760295},
+    {date: new Date(2024, 2, 16), latitude: -43.53202576436813, longitude: 172.63056850800214},
+    {date: new Date(2024, 2, 17), latitude: -33.86864111615657, longitude: 151.20853918403085}
+];
 
 const LastUpdated: React.FC = () => {
     const [ukTime, setUkTime] = useState<string>("-");
@@ -85,16 +120,19 @@ const LastUpdated: React.FC = () => {
     );
 };
 
+interface mapElementProps {
+    large?: boolean;
+}
+
 const MapElement: React.FC<mapElementProps> = (props) => {
-    const navigate = useNavigate();
     const windowLocation = useLocation();
     const queryParams = new URLSearchParams(windowLocation.search);
-    const time_range: string = queryParams.get("time_range") || "today";
+    const timeRange: string = queryParams.get("time_range") || "today";
 
     const getLocations = React.useCallback(async (): Promise<Location[]> => {
         try {
             const request = await fetch(
-                `${BACKEND_URL_BASE}/location/list?time_range=${time_range}`
+                `${BACKEND_URL_BASE}/location/list?time_range=${timeRange}`
             ).then(handleErrors);
             const response = await request;
             return response.locations;
@@ -102,9 +140,11 @@ const MapElement: React.FC<mapElementProps> = (props) => {
             console.error("Error fetching locations:", error);
             return [];
         }
-    }, [time_range]);
+    }, [timeRange]);
 
     const loadMap = React.useCallback(async () => {
+        const {Map, Polyline} = await loader.importLibrary("maps");
+        const {AdvancedMarkerElement} = await loader.importLibrary("marker");
         const locations = await getLocations();
         const locationCoordsArray: LocationCoords[] = locations.map((location) => {
             const lat = parseFloat(location.latitude);
@@ -112,41 +152,57 @@ const MapElement: React.FC<mapElementProps> = (props) => {
             return {lat, lng};
         });
 
-        loader
-            .importLibrary("maps")
-            .then(({Map, Polyline}) => {
-                let mapOptions, lastLocation;
-                if (locationCoordsArray.length) {
-                    lastLocation = locationCoordsArray[locationCoordsArray.length - 1];
-                    mapOptions = {
-                        zoom: 11,
-                        center: {lat: lastLocation.lat, lng: lastLocation.lng},
-                        mapTypeId: "terrain"
-                    };
-                } else {
-                    mapOptions = defaultMapOptions;
-                }
-                const map = new Map(document.getElementById("map"), mapOptions);
-                if (locationCoordsArray.length) {
-                    const polylineOptions = {
-                        path: locationCoordsArray,
-                        geodesic: true,
-                        strokeColor: "#FF0000",
-                        strokeOpacity: 1.0,
-                        strokeWeight: 2
-                    };
-                    const polyline = new Polyline(polylineOptions);
-                    polyline.setMap(map);
-                }
-            })
-            .catch((error) => {
-                console.error("Error loading Google Maps:", error);
+        let mapOptions: object, lastLocation: LocationCoords;
+        if (locationCoordsArray.length) {
+            lastLocation = locationCoordsArray[locationCoordsArray.length - 1];
+            mapOptions = {
+                zoom: 11,
+                center: lastLocation,
+                mapTypeId: "terrain",
+                mapId: uuid4()
+            };
+        } else {
+            mapOptions = defaultMapOptions;
+        }
+        const map = new Map(document.getElementById("map"), mapOptions);
+        if (locationCoordsArray.length) {
+            const polylineOptions = {
+                path: locationCoordsArray,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            };
+            const polyline = new Polyline(polylineOptions);
+            polyline.setMap(map);
+        }
+        if (lastLocation) {
+            const lastLocationMarker = document.createElement("div");
+            lastLocationMarker.className = "map-marker last-location-marker";
+            lastLocationMarker.textContent = "Last Location";
+            new AdvancedMarkerElement({
+                map: map,
+                position: lastLocation,
+                content: lastLocationMarker,
+                zIndex: 9999
             });
+        }
+        futureLocations.forEach((location, index) => {
+            if (location.date <= new Date()) {
+                return;
+            }
+            const lastLocationMarker = document.createElement("div");
+            lastLocationMarker.className = "map-marker future-location-marker";
+            lastLocationMarker.textContent = location.date.toDateString();
+            const markerOptions = {
+                map: map,
+                position: {lat: location.latitude, lng: location.longitude},
+                content: lastLocationMarker,
+                zIndex: futureLocations.length - index
+            };
+            new AdvancedMarkerElement(markerOptions);
+        });
     }, [getLocations]);
-
-    const handleTimeRangeButtonOnChange = (buttonValue: string) => {
-        navigate({search: `?time_range=${buttonValue}`});
-    };
 
     useEffect(() => {
         loadMap();
@@ -158,26 +214,7 @@ const MapElement: React.FC<mapElementProps> = (props) => {
                 <Col>
                     <LastUpdated />
                 </Col>
-                {props.large ? (
-                    <Col className="text-end">
-                        <ToggleButtonGroup
-                            type="radio"
-                            name="options"
-                            defaultValue={time_range}
-                            onChange={handleTimeRangeButtonOnChange}
-                        >
-                            <ToggleButton id="tbg-radio-1" value="today" size="sm">
-                                Today
-                            </ToggleButton>
-                            <ToggleButton id="tbg-radio-2" value="yesterday" size="sm">
-                                Yesterday
-                            </ToggleButton>
-                            <ToggleButton id="tbg-radio-3" value="all_time" size="sm">
-                                All Time
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                    </Col>
-                ) : null}
+                <TimeRangeToggle large={props.large} defaultValue={timeRange} />
             </Row>
             <Row className="mb-4">
                 <Col className={`map-container ${props.large ? "large" : ""}`}>

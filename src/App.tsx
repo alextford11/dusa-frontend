@@ -5,6 +5,7 @@ import Dashboard from "src/presentation/Dashboard";
 import {HashRouter as Router, Routes, Route} from "react-router-dom";
 import Location from "./presentation/Location";
 import {Container} from "react-bootstrap";
+import StatsList from "./presentation/Stats";
 
 const App: React.FC = () => {
     return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
                     <Route path="/">
                         <Route index element={<Dashboard />} />
                         <Route path="location" element={<Location />} />
+                        <Route path="stats" element={<StatsList />} />
                     </Route>
                 </Routes>
             </Router>

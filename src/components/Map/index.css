@@ -11,3 +11,33 @@
 .map-container.large {
     height: calc(100vh - 5.5rem);
 }
+
+.map-marker {
+    background-color: #4285f4;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 12px;
+    padding: 8px 12px;
+    position: relative;
+}
+
+.map-marker::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translate(-50%, 0);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #4285f4;
+}
+
+.last-location-marker {
+    background-color: rgba(var(--bs-danger-rgb));
+}
+
+.last-location-marker::after {
+    border-top-color: rgba(var(--bs-danger-rgb));
+}
