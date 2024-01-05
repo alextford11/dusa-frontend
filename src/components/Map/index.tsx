@@ -85,6 +85,10 @@ const LastUpdated: React.FC = () => {
 
     const updateLastLocation = React.useCallback(async () => {
         const lastLocation = await getLastLocation();
+        if (!lastLocation) {
+            return;
+        }
+
         const response = await fetch(
             `https://maps.googleapis.com/maps/api/timezone/json?location=${lastLocation.latitude},${
                 lastLocation.longitude
