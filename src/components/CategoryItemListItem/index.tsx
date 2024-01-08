@@ -1,7 +1,16 @@
 import {Category, CategoryItem} from "components/GlobalInterfaces";
 import React, {FormEvent, useEffect, useState} from "react";
 import {handleErrors} from "components/Utils";
-import {Button, ButtonGroup, Col, Form, ListGroup, Row} from "react-bootstrap";
+import {
+    Button,
+    ButtonGroup,
+    Col,
+    Form,
+    ListGroup,
+    Row,
+    Toast,
+    ToastContainer
+} from "react-bootstrap";
 
 declare const BACKEND_URL_BASE: string;
 
@@ -114,6 +123,7 @@ const CategoryItemListItemForm: React.FC<CategoryItemListItemFormProps> = (props
 
 const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [showCtcToast, setShowCtcToast] = useState<boolean>(false);
 
     const handleEditCategoryItemClick = () => {
         setIsEditing(true);
@@ -129,6 +139,11 @@ const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
         } catch (error) {
             console.error("Error:", error);
         }
+    };
+
+    const copyIdToClipboard = () => {
+        navigator.clipboard.writeText(props.categoryItem.id);
+        setShowCtcToast(true);
     };
 
     if (isEditing || props.categoryItem === undefined) {
@@ -150,10 +165,21 @@ const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
                         <p className="m-0">{props.categoryItem.name}</p>
                         <a
                             className="small"
-                            onClick={() => navigator.clipboard.writeText(props.categoryItem.id)}
+                            style={{cursor: "pointer"}}
+                            onClick={copyIdToClipboard}
                         >
                             {props.categoryItem.id}
                         </a>
+                        <ToastContainer position="middle-center" style={{zIndex: 1}}>
+                            <Toast
+                                onClose={() => setShowCtcToast(false)}
+                                show={showCtcToast}
+                                delay={3000}
+                                autohide
+                            >
+                                <Toast.Body>Copied to clipboard!</Toast.Body>
+                            </Toast>
+                        </ToastContainer>
                     </Col>
                     <Col>
                         <ButtonGroup className="float-end">
