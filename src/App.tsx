@@ -6,6 +6,7 @@ import {HashRouter as Router, Routes, Route} from "react-router-dom";
 import Location from "./presentation/Location";
 import {Container} from "react-bootstrap";
 import StatsList from "./presentation/Stats";
+import Backend from "./presentation/Backend";
 
 const App: React.FC = () => {
     return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
                         <Route index element={<Dashboard />} />
                         <Route path="location" element={<Location />} />
                         <Route path="stats" element={<StatsList />} />
+                        <Route path="backend" element={<Backend />} />
                     </Route>
                 </Routes>
             </Router>

@@ -7,5 +7,6 @@ export interface CategoryItem {
 export interface Category {
     id: string;
     name: string;
+    nsfw: boolean;
     category_items: CategoryItem[];
 }
