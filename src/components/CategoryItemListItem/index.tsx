@@ -145,19 +145,32 @@ const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
     } else {
         return (
             <ListGroup.Item>
-                {props.categoryItem.name}
-                <ButtonGroup className="float-end">
-                    <Button size="sm" onClick={handleEditCategoryItemClick}>
-                        Edit
-                    </Button>
-                    <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDeleteCategoryItemClick(props.categoryItem.id)}
-                    >
-                        Delete
-                    </Button>
-                </ButtonGroup>
+                <Row>
+                    <Col>
+                        <p className="m-0">{props.categoryItem.name}</p>
+                        <a
+                            className="small"
+                            onClick={() => navigator.clipboard.writeText(props.categoryItem.id)}
+                        >
+                            {props.categoryItem.id}
+                        </a>
+                    </Col>
+                    <Col>
+                        <ButtonGroup className="float-end">
+                            <Button size="sm" onClick={handleEditCategoryItemClick}>
+                                Edit
+                            </Button>
+                            <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => handleDeleteCategoryItemClick(props.categoryItem.id)}
+                            >
+                                Delete
+                            </Button>
+                        </ButtonGroup>
+                    </Col>
+                </Row>
+                <div className="small"></div>
             </ListGroup.Item>
         );
     }
