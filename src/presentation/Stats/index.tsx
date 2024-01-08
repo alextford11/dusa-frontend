@@ -29,7 +29,7 @@ const StatsList: React.FC = () => {
         const getStats = async () => {
             try {
                 const response = await fetch(
-                    `${BACKEND_URL_BASE}/stats?time_range=${time_range}&nsfw=${nsfw}`
+                    `${BACKEND_URL_BASE}/stats/?time_range=${time_range}&nsfw=${nsfw}`
                 ).then(handleErrors);
                 setStats(response.stats);
             } catch (error) {
