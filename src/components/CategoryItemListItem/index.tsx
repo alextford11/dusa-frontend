@@ -51,7 +51,7 @@ const CategoryItemListItemForm: React.FC<CategoryItemListItemFormProps> = (props
         event.preventDefault();
 
         try {
-            await fetch(`${BACKEND_URL_BASE}/category_item/`, {
+            await fetch(`${BACKEND_URL_BASE}/category_item`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({...formData, category_id: props.category.id})
@@ -68,7 +68,7 @@ const CategoryItemListItemForm: React.FC<CategoryItemListItemFormProps> = (props
         event.preventDefault();
 
         try {
-            await fetch(`${BACKEND_URL_BASE}/category_item/${props.categoryItem.id}/`, {
+            await fetch(`${BACKEND_URL_BASE}/category_item/${props.categoryItem.id}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(formData)
@@ -131,7 +131,7 @@ const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
 
     const handleDeleteCategoryItemClick = async (categoryId) => {
         try {
-            await fetch(`${BACKEND_URL_BASE}/category_item/${categoryId}/`, {
+            await fetch(`${BACKEND_URL_BASE}/category_item/${categoryId}`, {
                 method: "DELETE"
             }).then(handleErrors);
 

@@ -22,7 +22,7 @@ const Dashboard: React.FC = () => {
     useEffect(() => {
         const getStats = async () => {
             try {
-                const response = await fetch(`${BACKEND_URL_BASE}/dashboard/?nsfw=${nsfw}`).then(
+                const response = await fetch(`${BACKEND_URL_BASE}/dashboard?nsfw=${nsfw}`).then(
                     handleErrors
                 );
                 setStats(response.stats);

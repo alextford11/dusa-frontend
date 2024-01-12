@@ -76,7 +76,7 @@ const LastUpdated: React.FC = () => {
 
     const getLastLocation = React.useCallback(async (): Promise<Location> => {
         try {
-            return await fetch(`${BACKEND_URL_BASE}/location/recent/`).then(handleErrors);
+            return await fetch(`${BACKEND_URL_BASE}/location/recent`).then(handleErrors);
         } catch (error) {
             console.error("Error fetching recent location:", error);
             return;
@@ -85,7 +85,7 @@ const LastUpdated: React.FC = () => {
 
     const updateLastLocation = React.useCallback(async () => {
         const lastLocation = await getLastLocation();
-        if (!lastLocation) {
+        if (Object.keys(lastLocation).length === 0) {
             return;
         }
 
@@ -136,7 +136,7 @@ const MapElement: React.FC<mapElementProps> = (props) => {
     const getLocations = React.useCallback(async (): Promise<Location[]> => {
         try {
             const request = await fetch(
-                `${BACKEND_URL_BASE}/location/list/?time_range=${timeRange}`
+                `${BACKEND_URL_BASE}/location/list?time_range=${timeRange}`
             ).then(handleErrors);
             const response = await request;
             return response.locations;

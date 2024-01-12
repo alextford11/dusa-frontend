@@ -12,7 +12,7 @@ const Backend: React.FC = () => {
 
     const getCategories = React.useCallback(async () => {
         try {
-            const response = await fetch(`${BACKEND_URL_BASE}/category/`).then(handleErrors);
+            const response = await fetch(`${BACKEND_URL_BASE}/category`).then(handleErrors);
             setCategories(response.categories);
         } catch (error) {
             console.error("Error fetching categories:", error);
