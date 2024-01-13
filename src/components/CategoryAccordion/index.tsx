@@ -1,6 +1,6 @@
 import React from "react";
 import {Accordion, Badge, ListGroup} from "react-bootstrap";
-import {Category} from "components/GlobalInterfaces";
+import {Category} from "../GlobalInterfaces";
 
 interface CategoryAccordionProps {
     categories: Category[];

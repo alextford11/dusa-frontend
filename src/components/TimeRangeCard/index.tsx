@@ -1,8 +1,8 @@
 import React from "react";
 import {Button, Card} from "react-bootstrap";
-import CategoryAccordion from "components/CategoryAccordion";
-import {Category} from "components/GlobalInterfaces";
 import {Link} from "react-router-dom";
+import CategoryAccordion from "../CategoryAccordion";
+import {Category} from "../GlobalInterfaces";
 
 interface TimeRangeCardProps {
     timeRangeTitleText: string;

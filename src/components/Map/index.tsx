@@ -1,14 +1,11 @@
 import "./index.css";
 import React, {useEffect, useState} from "react";
-import {handleErrors} from "components/Utils";
 import {Loader} from "@googlemaps/js-api-loader";
 import {Col, Row} from "react-bootstrap";
 import {useLocation} from "react-router-dom";
 import {v4 as uuid4} from "uuid";
-import TimeRangeToggle from "components/TimeRangeToggle";
-
-declare const BACKEND_URL_BASE: string;
-declare const GOOGLE_MAPS_API_KEY: string;
+import {handleErrors} from "../Utils";
+import TimeRangeToggle from "../TimeRangeToggle";
 
 interface Location {
     id: string;
@@ -23,7 +20,7 @@ interface LocationCoords {
 }
 
 const loader = new Loader({
-    apiKey: GOOGLE_MAPS_API_KEY,
+    apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     version: "weekly",
     libraries: ["maps"]
 });
@@ -74,9 +71,9 @@ const LastUpdated: React.FC = () => {
     const [ukTime, setUkTime] = useState<string>("-");
     const [localTime, setLocalTime] = useState<string>("-");
 
-    const getLastLocation = React.useCallback(async (): Promise<Location> => {
+    const getLastLocation = React.useCallback(async (): Promise<Location | undefined> => {
         try {
-            return await fetch(`${BACKEND_URL_BASE}/location/recent`).then(handleErrors);
+            return await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/location/recent`).then(handleErrors);
         } catch (error) {
             console.error("Error fetching recent location:", error);
             return;
@@ -85,14 +82,14 @@ const LastUpdated: React.FC = () => {
 
     const updateLastLocation = React.useCallback(async () => {
         const lastLocation = await getLastLocation();
-        if (Object.keys(lastLocation).length === 0) {
+        if (lastLocation === undefined) {
             return;
         }
 
         const response = await fetch(
             `https://maps.googleapis.com/maps/api/timezone/json?location=${lastLocation.latitude},${
                 lastLocation.longitude
-            }&timestamp=${Math.floor(Date.now() / 1000)}&key=${GOOGLE_MAPS_API_KEY}`
+            }&timestamp=${Math.floor(Date.now() / 1000)}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
         );
         const timezoneDetails = await response.json();
 
@@ -136,7 +133,7 @@ const MapElement: React.FC<mapElementProps> = (props) => {
     const getLocations = React.useCallback(async (): Promise<Location[]> => {
         try {
             const request = await fetch(
-                `${BACKEND_URL_BASE}/location/list?time_range=${timeRange}`
+                `${import.meta.env.VITE_BACKEND_URL_BASE}/location/list?time_range=${timeRange}`
             ).then(handleErrors);
             const response = await request;
             return response.locations;
@@ -156,7 +153,8 @@ const MapElement: React.FC<mapElementProps> = (props) => {
             return {lat, lng};
         });
 
-        let mapOptions: object, lastLocation: LocationCoords;
+        let mapOptions: object
+        let lastLocation: LocationCoords | null = null;
         if (locationCoordsArray.length) {
             lastLocation = locationCoordsArray[locationCoordsArray.length - 1];
             mapOptions = {
@@ -180,7 +178,7 @@ const MapElement: React.FC<mapElementProps> = (props) => {
             const polyline = new Polyline(polylineOptions);
             polyline.setMap(map);
         }
-        if (lastLocation) {
+        if (lastLocation !== undefined) {
             const lastLocationMarker = document.createElement("div");
             lastLocationMarker.className = "map-marker last-location-marker";
             lastLocationMarker.textContent = "Last Location";
@@ -218,7 +216,7 @@ const MapElement: React.FC<mapElementProps> = (props) => {
                 <Col>
                     <LastUpdated />
                 </Col>
-                <TimeRangeToggle large={props.large} defaultValue={timeRange} />
+                <TimeRangeToggle large={props.large || false} defaultValue={timeRange} />
             </Row>
             <Row className="mb-4">
                 <Col className={`map-container ${props.large ? "large" : ""}`}>

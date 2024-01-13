@@ -1,18 +1,16 @@
 import {Accordion, Col, ListGroup, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {handleErrors} from "components/Utils";
-import {Category} from "components/GlobalInterfaces";
-import CategoryListItem from "components/CategoryListItem";
-import CategoryItemListItem from "components/CategoryItemListItem";
-
-declare const BACKEND_URL_BASE: string;
+import {Category} from "../../components/GlobalInterfaces";
+import {handleErrors} from "../../components/Utils";
+import CategoryListItem from "../../components/CategoryListItem";
+import CategoryItemListItem from "../../components/CategoryItemListItem";
 
 const Backend: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
 
     const getCategories = React.useCallback(async () => {
         try {
-            const response = await fetch(`${BACKEND_URL_BASE}/category`).then(handleErrors);
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category`).then(handleErrors);
             setCategories(response.categories);
         } catch (error) {
             console.error("Error fetching categories:", error);

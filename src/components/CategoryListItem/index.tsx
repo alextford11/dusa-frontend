@@ -1,9 +1,7 @@
-import {Category} from "components/GlobalInterfaces";
 import React, {FormEvent, useEffect, useState} from "react";
-import {handleErrors} from "components/Utils";
 import {Button, ButtonGroup, Col, Form, ListGroup, Row} from "react-bootstrap";
-
-declare const BACKEND_URL_BASE: string;
+import {Category} from "../GlobalInterfaces";
+import {handleErrors} from "../Utils";
 
 interface CategoryListItemProps {
     category?: Category;
@@ -21,7 +19,7 @@ const CategoryListItemForm: React.FC<CategoryListItemFormProps> = (props) => {
     });
 
     const hasCategory = React.useCallback(() => {
-        return props.category instanceof Object;
+        return props.category !== undefined;
     }, [props]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +40,7 @@ const CategoryListItemForm: React.FC<CategoryListItemFormProps> = (props) => {
         event.preventDefault();
 
         try {
-            await fetch(`${BACKEND_URL_BASE}/category`, {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(formData)
@@ -58,8 +56,9 @@ const CategoryListItemForm: React.FC<CategoryListItemFormProps> = (props) => {
     const handleUpdateCategory = async (event: FormEvent) => {
         event.preventDefault();
 
+        if (props.category !== undefined) {
         try {
-            await fetch(`${BACKEND_URL_BASE}/category/${props.category.id}`, {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category/${props.category.id}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(formData)
@@ -70,10 +69,11 @@ const CategoryListItemForm: React.FC<CategoryListItemFormProps> = (props) => {
         } catch (error) {
             console.error("Error:", error);
         }
+        }
     };
 
     useEffect(() => {
-        if (hasCategory()) {
+        if (props.category !== undefined) {
             setFormData({name: props.category.name, nsfw: props.category.nsfw});
         }
     }, [hasCategory, props]);
@@ -128,9 +128,13 @@ const CategoryListItem: React.FC<CategoryListItemProps> = (props) => {
         setIsEditing(true);
     };
 
-    const handleDeleteCategoryClick = async (categoryId) => {
+    const handleDeleteCategoryClick = async () => {
+        if (props.category === undefined) {
+            return
+        }
+
         try {
-            await fetch(`${BACKEND_URL_BASE}/category/${categoryId}`, {method: "DELETE"}).then(
+            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category/${props.category.id}`, {method: "DELETE"}).then(
                 handleErrors
             );
 
@@ -140,7 +144,7 @@ const CategoryListItem: React.FC<CategoryListItemProps> = (props) => {
         }
     };
 
-    if (isEditing || props.category === undefined) {
+    if (props.category === undefined || isEditing) {
         return (
             <ListGroup.Item>
                 <CategoryListItemForm
@@ -161,7 +165,7 @@ const CategoryListItem: React.FC<CategoryListItemProps> = (props) => {
                     <Button
                         variant="danger"
                         size="sm"
-                        onClick={() => handleDeleteCategoryClick(props.category.id)}
+                        onClick={() => handleDeleteCategoryClick}
                     >
                         Delete
                     </Button>

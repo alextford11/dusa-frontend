@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {Card, Col, Row} from "react-bootstrap";
-import {handleErrors} from "components/Utils";
-import {Category} from "components/GlobalInterfaces";
 import {useLocation} from "react-router-dom";
-import CategoryAccordion from "components/CategoryAccordion";
-import TimeRangeToggle from "components/TimeRangeToggle";
-
-declare const BACKEND_URL_BASE: string;
+import {Category} from "../../components/GlobalInterfaces";
+import {handleErrors} from "../../components/Utils";
+import TimeRangeToggle from "../../components/TimeRangeToggle";
+import CategoryAccordion from "../../components/CategoryAccordion";
 
 const StatsList: React.FC = () => {
     const windowLocation = useLocation();
@@ -29,7 +27,7 @@ const StatsList: React.FC = () => {
         const getStats = async () => {
             try {
                 const response = await fetch(
-                    `${BACKEND_URL_BASE}/stats?time_range=${time_range}&nsfw=${nsfw}`
+                    `${import.meta.env.VITE_BACKEND_URL_BASE}/stats?time_range=${time_range}&nsfw=${nsfw}`
                 ).then(handleErrors);
                 setStats(response.stats);
             } catch (error) {

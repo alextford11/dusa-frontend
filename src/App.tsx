@@ -1,12 +1,12 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import React from "react";
-import Dashboard from "src/presentation/Dashboard";
 import {HashRouter as Router, Routes, Route} from "react-router-dom";
 import Location from "./presentation/Location";
 import {Container} from "react-bootstrap";
 import StatsList from "./presentation/Stats";
 import Backend from "./presentation/Backend";
+import Dashboard from "./presentation/Dashboard";
 
 const App: React.FC = () => {
     return (

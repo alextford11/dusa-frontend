@@ -1,6 +1,4 @@
-import {Category, CategoryItem} from "components/GlobalInterfaces";
 import React, {FormEvent, useEffect, useState} from "react";
-import {handleErrors} from "components/Utils";
 import {
     Button,
     ButtonGroup,
@@ -11,8 +9,8 @@ import {
     Toast,
     ToastContainer
 } from "react-bootstrap";
-
-declare const BACKEND_URL_BASE: string;
+import {Category, CategoryItem} from "../GlobalInterfaces";
+import {handleErrors} from "../Utils";
 
 interface CategoryItemListItemProps {
     category: Category;
@@ -30,7 +28,7 @@ const CategoryItemListItemForm: React.FC<CategoryItemListItemFormProps> = (props
     });
 
     const hasCategoryItem = React.useCallback(() => {
-        return props.categoryItem instanceof Object;
+        return props.categoryItem !== undefined;
     }, [props]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +49,7 @@ const CategoryItemListItemForm: React.FC<CategoryItemListItemFormProps> = (props
         event.preventDefault();
 
         try {
-            await fetch(`${BACKEND_URL_BASE}/category_item`, {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category_item`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({...formData, category_id: props.category.id})
@@ -66,9 +64,12 @@ const CategoryItemListItemForm: React.FC<CategoryItemListItemFormProps> = (props
 
     const handleUpdateCategoryItem = async (event: FormEvent) => {
         event.preventDefault();
+        if (props.categoryItem === undefined) {
+            return;
+        }
 
         try {
-            await fetch(`${BACKEND_URL_BASE}/category_item/${props.categoryItem.id}`, {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category_item/${props.categoryItem.id}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(formData)
@@ -82,7 +83,7 @@ const CategoryItemListItemForm: React.FC<CategoryItemListItemFormProps> = (props
     };
 
     useEffect(() => {
-        if (hasCategoryItem()) {
+        if (props.categoryItem !== undefined) {
             setFormData({name: props.categoryItem.name});
         }
     }, [hasCategoryItem, props]);
@@ -129,9 +130,13 @@ const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
         setIsEditing(true);
     };
 
-    const handleDeleteCategoryItemClick = async (categoryId) => {
+    const handleDeleteCategoryItemClick = async () => {
+        if (props.categoryItem === undefined) {
+            return;
+        }
+
         try {
-            await fetch(`${BACKEND_URL_BASE}/category_item/${categoryId}`, {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category_item/${props.categoryItem.id}`, {
                 method: "DELETE"
             }).then(handleErrors);
 
@@ -142,6 +147,10 @@ const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
     };
 
     const copyIdToClipboard = () => {
+        if (props.categoryItem === undefined) {
+            return;
+        }
+
         navigator.clipboard.writeText(props.categoryItem.id);
         setShowCtcToast(true);
     };
@@ -189,7 +198,7 @@ const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
                             <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteCategoryItemClick(props.categoryItem.id)}
+                                onClick={() => handleDeleteCategoryItemClick}
                             >
                                 Delete
                             </Button>

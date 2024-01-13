@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {Col, Row} from "react-bootstrap";
-import {handleErrors} from "components/Utils";
-import MapElement from "components/Map";
-import {Category} from "components/GlobalInterfaces";
-import TimeRangeCard from "components/TimeRangeCard";
 import {useLocation} from "react-router-dom";
-
-declare const BACKEND_URL_BASE: string;
+import {Category} from "../../components/GlobalInterfaces";
+import {handleErrors} from "../../components/Utils";
+import MapElement from "../../components/Map";
+import TimeRangeCard from "../../components/TimeRangeCard";
 
 interface Stats {
     today: Category[];
@@ -22,7 +20,7 @@ const Dashboard: React.FC = () => {
     useEffect(() => {
         const getStats = async () => {
             try {
-                const response = await fetch(`${BACKEND_URL_BASE}/dashboard?nsfw=${nsfw}`).then(
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/dashboard?nsfw=${nsfw}`).then(
                     handleErrors
                 );
                 setStats(response.stats);
@@ -34,6 +32,7 @@ const Dashboard: React.FC = () => {
         getStats();
     }, [nsfw]);
 
+    console.log(import.meta.env.VITE_BACKEND_URL_BASE)
     return (
         <>
             <MapElement />
