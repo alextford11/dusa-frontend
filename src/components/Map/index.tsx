@@ -73,7 +73,9 @@ const LastUpdated: React.FC = () => {
 
     const getLastLocation = React.useCallback(async (): Promise<Location | undefined> => {
         try {
-            return await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/location/recent`).then(handleErrors);
+            return await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/location/recent`).then(
+                handleErrors
+            );
         } catch (error) {
             console.error("Error fetching recent location:", error);
             return;
@@ -153,7 +155,7 @@ const MapElement: React.FC<mapElementProps> = (props) => {
             return {lat, lng};
         });
 
-        let mapOptions: object
+        let mapOptions: object;
         let lastLocation: LocationCoords | null = null;
         if (locationCoordsArray.length) {
             lastLocation = locationCoordsArray[locationCoordsArray.length - 1];

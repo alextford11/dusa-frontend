@@ -69,11 +69,14 @@ const CategoryItemListItemForm: React.FC<CategoryItemListItemFormProps> = (props
         }
 
         try {
-            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category_item/${props.categoryItem.id}`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(formData)
-            }).then(handleErrors);
+            await fetch(
+                `${import.meta.env.VITE_BACKEND_URL_BASE}/category_item/${props.categoryItem.id}`,
+                {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(formData)
+                }
+            ).then(handleErrors);
 
             props.updateCategories();
             props.updateIsEditing();
@@ -136,9 +139,12 @@ const CategoryItemListItem: React.FC<CategoryItemListItemProps> = (props) => {
         }
 
         try {
-            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category_item/${props.categoryItem.id}`, {
-                method: "DELETE"
-            }).then(handleErrors);
+            await fetch(
+                `${import.meta.env.VITE_BACKEND_URL_BASE}/category_item/${props.categoryItem.id}`,
+                {
+                    method: "DELETE"
+                }
+            ).then(handleErrors);
 
             props.updateCategories();
         } catch (error) {

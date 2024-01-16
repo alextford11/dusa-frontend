@@ -11,6 +11,7 @@ interface Stats {
     yesterday: Category[];
     all_time: Category[];
 }
+
 const Dashboard: React.FC = () => {
     const windowLocation = useLocation();
     const queryParams = new URLSearchParams(windowLocation.search);
@@ -20,9 +21,9 @@ const Dashboard: React.FC = () => {
     useEffect(() => {
         const getStats = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/dashboard?nsfw=${nsfw}`).then(
-                    handleErrors
-                );
+                const response = await fetch(
+                    `${import.meta.env.VITE_BACKEND_URL_BASE}/dashboard?nsfw=${nsfw}`
+                ).then(handleErrors);
                 setStats(response.stats);
             } catch (error) {
                 console.error("Error fetching stats:", error);
@@ -32,7 +33,6 @@ const Dashboard: React.FC = () => {
         getStats();
     }, [nsfw]);
 
-    console.log(import.meta.env.VITE_BACKEND_URL_BASE)
     return (
         <>
             <MapElement />

@@ -57,18 +57,21 @@ const CategoryListItemForm: React.FC<CategoryListItemFormProps> = (props) => {
         event.preventDefault();
 
         if (props.category !== undefined) {
-        try {
-            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category/${props.category.id}`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(formData)
-            }).then(handleErrors);
+            try {
+                await fetch(
+                    `${import.meta.env.VITE_BACKEND_URL_BASE}/category/${props.category.id}`,
+                    {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify(formData)
+                    }
+                ).then(handleErrors);
 
-            props.updateCategories();
-            props.updateIsEditing();
-        } catch (error) {
-            console.error("Error:", error);
-        }
+                props.updateCategories();
+                props.updateIsEditing();
+            } catch (error) {
+                console.error("Error:", error);
+            }
         }
     };
 
@@ -130,13 +133,13 @@ const CategoryListItem: React.FC<CategoryListItemProps> = (props) => {
 
     const handleDeleteCategoryClick = async () => {
         if (props.category === undefined) {
-            return
+            return;
         }
 
         try {
-            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category/${props.category.id}`, {method: "DELETE"}).then(
-                handleErrors
-            );
+            await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/category/${props.category.id}`, {
+                method: "DELETE"
+            }).then(handleErrors);
 
             props.updateCategories();
         } catch (error) {
@@ -162,11 +165,7 @@ const CategoryListItem: React.FC<CategoryListItemProps> = (props) => {
                     <Button size="sm" onClick={handleEditCategoryClick}>
                         Edit
                     </Button>
-                    <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDeleteCategoryClick}
-                    >
+                    <Button variant="danger" size="sm" onClick={() => handleDeleteCategoryClick}>
                         Delete
                     </Button>
                 </ButtonGroup>
