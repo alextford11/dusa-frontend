@@ -161,7 +161,7 @@ const MapElement: React.FC<mapElementProps> = (props) => {
         if (locationCoordsArray.length) {
             lastLocation = locationCoordsArray[locationCoordsArray.length - 1];
             mapOptions = {
-                zoom: 11,
+                zoom: 12,
                 center: lastLocation,
                 mapTypeId: "terrain",
                 mapId: uuid4()
