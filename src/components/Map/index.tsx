@@ -36,6 +36,7 @@ interface futureLocation {
     latitude: number;
     longitude: number;
 }
+
 const futureLocations: futureLocation[] = [
     {date: new Date(2024, 0, 28), latitude: -33.86864111615657, longitude: 151.20853918403085},
     {date: new Date(2024, 1, 2), latitude: -28.641970494705618, longitude: 153.61045230186474},
@@ -181,13 +182,22 @@ const MapElement: React.FC<mapElementProps> = (props) => {
             polyline.setMap(map);
         }
         if (lastLocation !== undefined) {
-            const lastLocationMarker = document.createElement("div");
-            lastLocationMarker.className = "map-marker last-location-marker";
-            lastLocationMarker.textContent = "Last Location";
+            const lastLocationContainer = document.createElement("div");
+            lastLocationContainer.className = "map-dot-container";
+
+            const lastLocationDotBorder = document.createElement("div");
+            lastLocationDotBorder.className = "map-dot-border";
+
+            const lastLocationDot = document.createElement("div");
+            lastLocationDot.className = "map-dot";
+
+            lastLocationDotBorder.appendChild(lastLocationDot);
+            lastLocationContainer.appendChild(lastLocationDotBorder);
+
             new AdvancedMarkerElement({
                 map: map,
                 position: lastLocation,
-                content: lastLocationMarker,
+                content: lastLocationContainer,
                 zIndex: 9999
             });
         }
