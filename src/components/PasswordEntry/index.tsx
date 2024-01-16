@@ -37,7 +37,11 @@ const PasswordEntry: React.FC<PasswordEntryProps> = (props) => {
     };
 
     return (
-        <Form className="d-flex align-items-center" onSubmit={handlePasswordFormOnSubmit}>
+        <Form
+            id="password-entry-form"
+            className="d-flex align-items-center"
+            onSubmit={handlePasswordFormOnSubmit}
+        >
             <Container>
                 <Row>
                     <Col xs="12" md={{span: 6, offset: 3}}>
