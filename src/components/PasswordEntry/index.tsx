@@ -11,9 +11,10 @@ interface PasswordEntryProps {
 }
 
 const PasswordEntry: React.FC<PasswordEntryProps> = (props) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{[key: string]: string}>({
         password: ""
     });
+    const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
     const windowLocation = useLocation();
     const navigate = useNavigate();
     const cookies = new Cookies(null, {path: "/"});
@@ -25,6 +26,12 @@ const PasswordEntry: React.FC<PasswordEntryProps> = (props) => {
             ...formData,
             [name]: value
         });
+
+        if (name in formErrors) {
+            const newFormErrors = {...formErrors};
+            delete newFormErrors[name];
+            setFormErrors(newFormErrors);
+        }
     };
 
     const handlePasswordFormOnSubmit = async (event: FormEvent) => {
@@ -32,8 +39,10 @@ const PasswordEntry: React.FC<PasswordEntryProps> = (props) => {
         const passwordHash = SHA256(formData.password).toString(enc.Hex);
         if (props.authToken === passwordHash) {
             cookies.set(props.cookieKey, true);
+            navigate({pathname: windowLocation.pathname, search: windowLocation.search});
+        } else {
+            setFormErrors({password: "Incorrect password, please try again"});
         }
-        navigate({pathname: windowLocation.pathname, search: windowLocation.search});
     };
 
     return (
@@ -52,7 +61,11 @@ const PasswordEntry: React.FC<PasswordEntryProps> = (props) => {
                                 placeholder="Password"
                                 required
                                 onChange={handleInputChange}
+                                isInvalid={"password" in formErrors}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {formErrors["password"]}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                 </Row>
