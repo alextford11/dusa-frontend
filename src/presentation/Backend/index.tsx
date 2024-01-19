@@ -7,6 +7,44 @@ import CategoryItemListItem from "../../components/CategoryItemListItem";
 import PasswordEntry from "../../components/PasswordEntry";
 import Cookies from "universal-cookie";
 
+interface RecordListItem {
+    id: string;
+    value: number;
+    created: Date;
+    category_item_name: string;
+    category_name: string;
+}
+
+const RecordsList: React.FC = () => {
+    const [records, setRecords] = useState<RecordListItem[]>([]);
+
+    const getRecords = React.useCallback(async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_BASE}/record`).then(
+                handleErrors
+            );
+            setRecords(response.records);
+        } catch (error) {
+            console.error("Error fetching records:", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        getRecords();
+    }, [getRecords]);
+
+    return (
+        <ListGroup>
+            {records.map((record) => (
+                <ListGroup.Item key={record.id}>
+                    {record.category_name} &bull; {record.category_item_name} &bull;{" "}
+                    {new Date(record.created).toLocaleString()} &bull; {record.value}
+                </ListGroup.Item>
+            ))}
+        </ListGroup>
+    );
+};
+
 const Backend: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const cookies = new Cookies(null, {path: "/"});
@@ -63,7 +101,7 @@ const Backend: React.FC = () => {
                         </Row>
                     </Col>
                 </Row>
-                <Row>
+                <Row className="mb-4">
                     <Col>
                         <Row>
                             <Col>
@@ -96,6 +134,21 @@ const Backend: React.FC = () => {
                                         </Accordion.Item>
                                     ))}
                                 </Accordion>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Row>
+                            <Col>
+                                <h2>Recent Records</h2>
+                                <hr />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <RecordsList />
                             </Col>
                         </Row>
                     </Col>
